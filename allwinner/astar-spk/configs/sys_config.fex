@@ -784,7 +784,7 @@ sdc_clk           = port:PF02<2><1><2><default>
 sdc_cmd           = port:PF03<2><1><2><default>
 sdc_d3            = port:PF04<2><1><2><default>
 sdc_d2            = port:PF05<2><1><2><default>
-sdc_det           = port:PD14<0><1><2><default>
+sdc_det           = port:PB03<0><1><2><default>
 sdc_power_supply  = "axp22_dcdc1"
 sdc_use_wp        = 0
 sdc_wp            =
@@ -1125,8 +1125,8 @@ frame_width         = 1
 tx_data_mode		= 1
 rx_data_mode		= 1
 i2s0_mclk            =
-i2s0_bclk            = port:PB04<2><1><default><default>
-i2s0_lrclk           = port:PB05<2><1><default><default>
+i2s0_bclk            = port:PB05<2><1><default><default>
+i2s0_lrclk           = port:PB04<2><1><default><default>
 i2s0_dout0           = port:PB06<2><1><default><default>
 i2s0_dout1           =
 i2s0_dout2           =
@@ -1195,29 +1195,42 @@ audio_used		= 1
 audio_hp_ldo			= "none"
 headphone_vol			= 0x3b
 earpiece_vol			= 0x3e
-cap_vol					= 0x5
+cap_vol				= 0x2
 pa_single_vol			= 0x3a
 pa_double_used			= 1
 pa_double_vol			= 0x3e
 headphone_direct_used	= 1
-headset_mic_vol			= 3
+headset_mic_vol			= 1
 main_mic_vol		= 1
-mic1_used				= 1
-mic2_used				= 1
-linein_to_spk_used	= 1
-linein_to_hp_used		= 0
-linein_to_aif2_used     = 0
 audio_lowlevel_detect	= 1
-sysaudio_to_aif2_used	= 0
-audio_linein_ctrl	= port:PB00<0><default><default><0>
-audio_pa_ctrl		= port:PL11<1><default><default><0>
+audio_linein_detect	= port:PB00<0><default><default><0>
+audio_pa_en		= port:PL11<1><default><default><0>
+audio_pa_ctrl		= port:PE15<1><default><default><0>
 aif2_used		= 0
 aif3_used		= 0
-headphone_mute_used	= 0
-DAC_VOL_CTRL_SPK        = 0xa0a0
-DAC_VOL_CTRL_HEADPHONE	= 0xa0a0
-agc_used				= 1
+headphone_mute_used 	= 0
+pa_gpio_reverse 	= 1
+aif1_lrlk_div  		= 0x40
+agc_used				= 0
 drc_used				= 0
+
+[codec_aif2]
+aif2_lrlk_div = 0x20
+aif2master = 1
+aif2fmt = 0
+aif2_bclk            = port:PB05<3><1><default><default>
+aif2_lrclk           = port:PB04<3><1><default><default>
+aif2_dout            = port:PB06<3><1><default><default>
+aif2_din             = port:PB07<3><1><default><default>
+
+[codec_aif3]
+aif3fmt = 4
+aif3_bclk            = port:PG11<3><1><default><default>
+aif3_lrclk           = port:PG10<3><1><default><default>
+aif3_dout            = port:PG12<3><1><default><default>
+aif3_din             = port:PG13<3><1><default><default>
+
+
 ;-------------------------------------------------------------------------------------
 ;pmu_used                    ---0:not used,1:used
 ;pmu_twi_addr                ---slave address

@@ -217,8 +217,8 @@ emac_power3        = ""
 ; 10/100/1000Mbps Ethernet MAC Controller Configure (GMAC)                     ;
 ;------------------------------------------------------------------------------;
 ;   Configure Options:                                                         ;
-;   gmac_used  ---  1: gmac used, 0: not used                                  ;
-;   gmac_powerX --  A[:B] A: axp channel, B: voltage value (X: [1 ~ 20])       ;
+;   gmac_used   --  1: gmac used, 0: not used                                  ;
+;   gmac_power  --  AXP regulator supply id                                    ;
 ;   phy-rst     --  Used GPIO to reset the phy device                          ;
 ;   phy-mode    --  rgmii, mii, rmii                                           ;
 ;   tx-delay    --  transmit clock delay: 0~7                                  ;
@@ -235,7 +235,7 @@ emac_power3        = ""
 ;   PA11  *            *                                                       ;
 ;------------------------------------------------------------------------------;
 [gmac0]
-gmac0_used         = 1
+gmac0_used         = 0
 phy-mode           = "mii"
 gmac_rxd3          = port:PA00<5><default><3><default>
 gmac_rxd2          = port:PA01<5><default><3><default>
@@ -256,9 +256,9 @@ gmac_crs           = port:PA15<5><default><3><default>
 gmac_ecol          = port:PA16<5><default><3><default>
 ;gmac_txerr         = port:PA17<5><default><3><default>
 phy-rst            = port:PA17<1><1><1><0>
-gmac_power1        = "vcc-pa:3000000"
-gmac_power2        = ""
-gmac_power3        = ""
+gmac-power0        = "vcc-ephy0"
+gmac-power1        = ""
+gmac-power2        = ""
 tx-delay           = 0
 rx-delay           = 0
 
@@ -301,6 +301,15 @@ twi2_sda         = port:PB21<2><default><default><default>
 ;[twi0/twi_board0]
 ;compatible        =
 ;reg               =
+
+;-----------------------------------------------------------------------------
+;ir remote configuration
+;-----------------------------------------------------------------------------
+[ir0]
+ir0_used            = 1
+ir_power_key_code   = 0x0
+ir_addr_code0       = 0x04
+ir_addr_cnt         = 0x1
 
 ;----------------------------------------------------------------------------------
 ;uart configuration
@@ -962,14 +971,14 @@ di_used             = 1
 [sdc0]
 sdc0_used          = 1
 bus-width		      = 4
-sdc0_d1            = port:PF00<2><1><2><default>
-sdc0_d0            = port:PF01<2><1><2><default>
-sdc0_clk           = port:PF02<2><1><2><default>
-sdc0_cmd           = port:PF03<2><1><2><default>
-sdc0_d3            = port:PF04<2><1><2><default>
-sdc0_d2            = port:PF05<2><1><2><default>
-cd-gpios           = port:PI05<0><1><2><default>
-;wp-gpios          = port:PG01<0><1><2><default>
+sdc0_d1            = port:PF00<2><1><3><default>
+sdc0_d0            = port:PF01<2><1><3><default>
+sdc0_clk           = port:PF02<2><1><3><default>
+sdc0_cmd           = port:PF03<2><1><3><default>
+sdc0_d3            = port:PF04<2><1><3><default>
+sdc0_d2            = port:PF05<2><1><3><default>
+cd-gpios           = port:PI05<0><1><3><default>
+;wp-gpios          = port:PG01<0><1><3><default>
 ;wp-inverted       =
 broken-cd       =
 sunxi-power-save-mode =
@@ -1363,7 +1372,7 @@ dachpf_cfg =   0x0
 ;pmu_vbusen_func             ---N_VBUSEN function select,0:as an output,1:as an input
 ;pmu_reset                   ---when power key press longer than 16's,PMU reset or not.0:not reset 1:reset
 ;pmu_irq_wakeup              ---press irq wakeup or not when sleep or power down.0:not wakeup 1:wakeup
-;pmu_hot_shutdowm            ---when PMU over temperature protect or not;0:disable 1:enable
+;pmu_hot_shutdown            ---when PMU over temperature protect or not;0:disable 1:enable
 ;pmu_inshort                 ---ACIN and VBUS inshort or not by software;0:auto detect 1:inshort
 ;--------------------------------------------------------------------------------------------------------
 [pmu0]
@@ -1374,7 +1383,7 @@ reg                        = 0x34
 pmu_vbusen_func            = 0
 pmu_reset                  = 0
 pmu_irq_wakeup             = 1
-pmu_hot_shutdowm           = 1
+pmu_hot_shutdown           = 1
 pmu_inshort                = 0
 
 ;--------------------------------------------------------------------------------------------------------
@@ -1396,6 +1405,9 @@ pmu_inshort                = 0
 ;pmu_chgled_func             ---CHGKED pin control, 0:controlled by pmu,1:controlled by Charger
 ;pmu_chgled_type             ---CHGLED Type select when pmu_chgled_func=0,0:Type A, 1:type B
 ;power_start                 ---when system is in charging, shutdown is power off or resart;0:restart 1:poweroff
+;pmu_ocv_en                  ---charge by ocv, 1:enable, must be enabled
+;pmu_cou_en                  ---charge by cou, 0:disable, 1:enable
+;pmu_update_min_time         ---min time for battery capatity percentage update,second, 0/5/10/20/30/60/120/164
 ;pmu_bat_para1               ---battery indication at 3.13V
 ;pmu_bat_para2               ---battery indication at 3.27V
 ;pmu_bat_para3               ---battery indication at 3.34V
@@ -1469,6 +1481,9 @@ pmu_battery_warning_level2 = 0
 pmu_chgled_func            = 0
 pmu_chgled_type            = 0
 power_start                = 0
+pmu_ocv_en                 = 1
+pmu_cou_en                 = 1
+pmu_update_min_time        = 30
 
 pmu_bat_para1              = 0
 pmu_bat_para2              = 0
@@ -1555,7 +1570,7 @@ regulator3      = "axp221s_dcdc3 none vdd-sys vdd-gpu"
 regulator4      = "axp221s_dcdc4 none"
 regulator5      = "axp221s_dcdc5 none vcc-dram"
 regulator6      = "axp221s_rtc none vcc-rtc"
-regulator7      = "axp221s_aldo1 none vcc-pa vcc-25"
+regulator7      = "axp221s_aldo1 none vcc-pa vcc-25 vcc-ephy0"
 regulator8      = "axp221s_aldo2 none vcc-lpddr vcc-pc"
 regulator9      = "axp221s_aldo3 none avcc vcc-pll"
 regulator10     = "axp221s_dldo1 none vcc-io-wifi vcc-pg"

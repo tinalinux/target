@@ -8,5 +8,5 @@ config SUNXI_SMALL_STORAGE_OTA
 
 config SUNXI_RECOVERY_INITRAMFS_PARTSIZE
         int "Boot-Recovery initramfs filesystem partition size (in MB)"
-        default 16
+        default 7
 

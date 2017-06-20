@@ -16,7 +16,6 @@ SDK_NAME:=$(VERSION_DIST)-SDK-$(if $(CONFIG_VERSION_FILENAMES),$(VERSION_NUMBER)
 SDK_BUILD_DIR:=$(COMPILE_DIR)/$(SDK_NAME)
 
 STAGING_SUBDIR_HOST := $(TOPDIR)/out/host
-STAGING_SUBDIR_TOOLCHAIN := $(TARGET_OUT_DIR)/staging_dir/toolchain
 
 EXCLUDE_DIRS:=*/ccache \
 	*/stamp \
@@ -31,8 +30,7 @@ EXCLUDE_DIRS:=*/ccache \
 	*/doc
 
 SDK_DIRS = \
-		$(STAGING_SUBDIR_HOST) \
-		$(STAGING_SUBDIR_TOOLCHAIN)
+		$(STAGING_SUBDIR_HOST)
 
 BASE_FEED:=$(shell git config --get remote.origin.url 2>/dev/null | sed -ne 's/^/src-git base /p')
 BASE_FEED:=$(if $(BASE_FEED),$(BASE_FEED),$(shell cd $(TOPDIR); LC_ALL=C git svn info 2>/dev/null | sed -ne 's/^URL: /src-gitsvn base /p'))
@@ -66,7 +64,7 @@ all: compile
 
 $(TARGET_OUT_DIR)/$(SDK_NAME).tar.bz2: clean
 	mkdir -p $(SDK_BUILD_DIR)/dl $(SDK_BUILD_DIR)/package
-	$(CP) $(BUILD_DIR) $(SCRIPT_DIR) $(TOPDIR)/docs $(SDK_BUILD_DIR)/
+	$(CP) $(BUILD_DIR) $(SCRIPT_DIR) $(TOPDIR)/prebuilt $(TOPDIR)/docs $(SDK_BUILD_DIR)/
 	$(TAR) -cf - -C $(TOPDIR) \
 		`cd $(TOPDIR); find $(KDIR_BASE) -name \*.ko` \
 		$(foreach exclude,$(EXCLUDE_DIRS),--exclude="$(exclude)") \
@@ -77,9 +75,6 @@ $(TARGET_OUT_DIR)/$(SDK_NAME).tar.bz2: clean
 		find \
 			$(SDK_BUILD_DIR)/$(STAGING_SUBDIR_HOST)/bin \
 			$(SDK_BUILD_DIR)/$(STAGING_SUBDIR_HOST)/usr/bin \
-			$(SDK_BUILD_DIR)/$(STAGING_SUBDIR_TOOLCHAIN)/bin \
-			$(SDK_BUILD_DIR)/$(STAGING_SUBDIR_TOOLCHAIN)/*/bin \
-			$(SDK_BUILD_DIR)/$(STAGING_SUBDIR_TOOLCHAIN)/libexec \
 			-type f; \
 		find \
 			$(SDK_BUILD_DIR)/$(STAGING_SUBDIR_HOST)/lib \
@@ -87,11 +82,11 @@ $(TARGET_OUT_DIR)/$(SDK_NAME).tar.bz2: clean
 			-type f -name \*.so\* -or -name \*.a; \
 	) | xargs strip 2>/dev/null >/dev/null
 
-	mkdir -p $(SDK_BUILD_DIR)/target/linux
-	$(CP) $(GENERIC_PLATFORM_DIR) $(PLATFORM_DIR) $(SDK_BUILD_DIR)/target/linux/
+	mkdir -p $(SDK_BUILD_DIR)/target/allwinner
+	$(CP) $(GENERIC_PLATFORM_DIR) $(PLATFORM_DIR) $(GENERIC_PLATFORM_DIR)/../$(TARGET_PLATFORM)-common $(SDK_BUILD_DIR)/target/allwinner/
 	rm -rf \
-		$(SDK_BUILD_DIR)/target/linux/*/files* \
-		$(SDK_BUILD_DIR)/target/linux/*/patches*
+		$(SDK_BUILD_DIR)/target/allwinner/*/files* \
+		$(SDK_BUILD_DIR)/target/allwinner/*/patches*
 	./convert-config.pl $(TOPDIR)/.config > $(SDK_BUILD_DIR)/Config-build.in
 	$(CP) -L \
 		$(BUILD_DIR)/LICENSE \
@@ -106,13 +101,6 @@ $(TARGET_OUT_DIR)/$(SDK_NAME).tar.bz2: clean
 		$(TOPDIR)/package/Makefile \
 		$(SDK_BUILD_DIR)/package/
 
-	-rm -f $(SDK_BUILD_DIR)/feeds.conf.default
-	$(if $(BASE_FEED),echo "$(BASE_FEED)" > $(SDK_BUILD_DIR)/feeds.conf.default)
-	if [ -f $(SCRIPT_DIR)/feeds.conf ]; then \
-		cat $(SCRIPT_DIR)/feeds.conf >> $(SDK_BUILD_DIR)/feeds.conf.default; \
-	else \
-		cat $(SCRIPT_DIR)/feeds.conf.default >> $(SDK_BUILD_DIR)/feeds.conf.default; \
-	fi
 	$(SED) 's,^# REVISION:=.*,REVISION:=$(REVISION),g' $(SDK_BUILD_DIR)/build/version.mk
 	$(SED) '/LINUX_VERMAGIC:=/ { s,unknown,$(LINUX_VERMAGIC),g }' $(SDK_BUILD_DIR)/build/kernel.mk
 	find $(SDK_BUILD_DIR) -name .git | $(XARGS) rm -rf

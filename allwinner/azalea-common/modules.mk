@@ -7,14 +7,13 @@
 define KernelPackage/sunxi-vfe
   SUBMENU:=$(VIDEO_MENU)
   TITLE:=sunxi-vfe support
-  FILES:=$(LINUX_DIR)/drivers/media/video/videobuf-core.ko
-  FILES+=$(LINUX_DIR)/drivers/media/video/videobuf-dma-contig.ko
-  FILES+=$(LINUX_DIR)/drivers/media/video/sunxi-vfe/csi_cci/cci.ko
-  FILES+=$(LINUX_DIR)/drivers/media/video/sunxi-vfe/vfe_os.ko
-  FILES+=$(LINUX_DIR)/drivers/media/video/sunxi-vfe/vfe_subdev.ko
-  FILES+=$(LINUX_DIR)/drivers/media/video/sunxi-vfe/device/gc0308.ko
-  FILES+=$(LINUX_DIR)/drivers/media/video/sunxi-vfe/vfe_v4l2.ko
-  AUTOLOAD:=$(call AutoLoad,90,videobuf-core videobuf-dma-contig cci vfe_os vfe_subdev gc0308 vfe_v4l2)
+  FILES:=$(LINUX_DIR)/drivers/media/v4l2-core/videobuf2-core.ko
+  FILES+=$(LINUX_DIR)/drivers/media/v4l2-core/videobuf2-dma-contig.ko
+  FILES+=$(LINUX_DIR)/drivers/media/v4l2-core/videobuf2-memops.ko
+  FILES+=$(LINUX_DIR)/drivers/media/platform/sunxi-vfe/vfe_io.ko
+  FILES+=$(LINUX_DIR)/drivers/media/platform/sunxi-vfe/device/ov5640.ko
+  FILES+=$(LINUX_DIR)/drivers/media/platform/sunxi-vfe/vfe_v4l2.ko
+  AUTOLOAD:=$(call AutoLoad,90,videobuf2-core videobuf2-dma-contig videobuf2-memops vfe_io ov5640 vfe_v4l2)
 endef
 
 define KernelPackage/sunxi-vfe/description
@@ -22,6 +21,26 @@ define KernelPackage/sunxi-vfe/description
 endef
 
 $(eval $(call KernelPackage,sunxi-vfe))
+
+define KernelPackage/sunxi-uvc
+  SUBMENU:=$(VIDEO_MENU)
+  TITLE:=sunxi-uvc support
+  FILES:=$(LINUX_DIR)/drivers/media/v4l2-core/videobuf2-core.ko
+  FILES+=$(LINUX_DIR)/drivers/media/v4l2-core/videobuf2-memops.ko
+  FILES+=$(LINUX_DIR)/drivers/media/v4l2-core/videobuf2-vmalloc.ko
+  FILES+=$(LINUX_DIR)/drivers/media/usb/uvc/uvcvideo.ko
+  KCONFIG:= \
+	  CONFIG_MEDIA_USB_SUPPORT=y \
+	  CONFIG_USB_VIDEO_CLASS \
+	  CONFIG_USB_VIDEO_CLASS_INPUT_EVDEV
+  AUTOLOAD:=$(call AutoLoad,95,videobuf2-core videobuf2-memops videobuf2_vmalloc uvcvideo)
+endef
+
+define KernelPackage/sunxi-uvc/description
+  Kernel modules for sunxi-uvc support
+endef
+
+$(eval $(call KernelPackage,sunxi-uvc))
 
 define KernelPackage/leds-sunxi
   SUBMENU:=$(LEDS_MENU)
@@ -66,7 +85,7 @@ define KernelPackage/sunxi-disp
   SUBMENU:=$(VIDEO_MENU)
   TITLE:=sunxi-disp support
   FILES+=$(LINUX_DIR)/drivers/video/sunxi/disp2/disp/disp.ko
-  AUTOLOAD:=$(call AutoLoad,10,disp)
+  AUTOLOAD:=$(call AutoLoad,10,disp,1)
 endef
 
 define KernelPackage/sunxi-disp/description
@@ -94,7 +113,7 @@ define KernelPackage/sunxi-hdmi
   TITLE:=sunxi-hdmi support
   DEPENDS:=+kmod-sunxi-disp
   FILES+=$(LINUX_DIR)/drivers/video/sunxi/disp2/hdmi/hdmi.ko
-  AUTOLOAD:=$(call AutoLoad,15,hdmi)
+  AUTOLOAD:=$(call AutoLoad,15,hdmi,1)
 endef
 
 define KernelPackage/sunxi-hdmi/description
@@ -102,3 +121,17 @@ define KernelPackage/sunxi-hdmi/description
 endef
 
 $(eval $(call KernelPackage,sunxi-hdmi))
+
+define KernelPackage/net-broadcom
+  SUBMENU:=$(WIRELESS_MENU)
+  TITLE:=broadcom(ap6212/ap6335/ap6255...) support
+  DEPENDS:=@LINUX_3_10
+  FILES:=$(LINUX_DIR)/drivers/net/wireless/bcmdhd/bcmdhd.ko
+  AUTOLOAD:=$(call AutoProbe,bcmdhd,1)
+endef
+
+define KernelPackage/net-broadcom/description
+ Kernel modules for Broadcom AP6212/AP6335/AP6255...  support
+endef
+
+$(eval $(call KernelPackage,net-broadcom))

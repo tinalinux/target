@@ -53,8 +53,8 @@ size = 16384
 
 [partition]
     name         = rootfs
-    size         = 16384
-    ;downloadfile = "rootfs.fex"
+    size         = 32768
+    downloadfile = "rootfs.fex"
     user_type    = 0x8000
 
 [partition]
@@ -65,6 +65,15 @@ size = 16384
 [partition]
     name         = private
     size         = 2048
+    user_type    = 0x8000
+
+;   recovery分区说明
+;   如果启用了OTA升级，默认以boot_initramfs.img作为recovery.fex，否则recovery.fex为空
+
+[partition]
+    name         = recovery
+    size         = 32768
+	downloadfile="recovery.fex"
     user_type    = 0x8000
 
 [partition]

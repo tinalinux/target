@@ -14,7 +14,11 @@ include $(BUILD_DIR)/version.mk
 
 override MAKEFLAGS=
 
-TOOLCHAIN_NAME:=toolchain-$(ARCH_PACKAGES)
+ifeq ($(TARGET_CPU_VARIANT),arm926ej-s)
+TOOLCHAIN_NAME:=toolchain-$(ARCH_PACKAGES)-arm9-$(LIBC)
+else
+TOOLCHAIN_NAME:=toolchain-$(ARCH_PACKAGES)-$(LIBC)
+endif
 TOOLCHAIN_BUILD_DIR:=$(COMPILE_DIR)/$(TOOLCHAIN_NAME)
 EXCLUDE_DIRS:=*/ccache \
 	*/initial \

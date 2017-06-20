@@ -16,7 +16,7 @@ ENTRY_POINT:=0x40008000
 IMAGE_DATA:=zImage
 UIMAGE_NAME:=uImage
 TARCH:=$(ARCH)
-
+COMP:=none
 ifeq ($(ARCH), aarch64)
 TARCH=arm64
 endif
@@ -26,9 +26,15 @@ UIMAGE_NAME=uImage-initramfs
 endif
 
 ifeq ($(TARGET_BOARD_PLATFORM), tulip)
-LOAD_ADDRESS=0x41000000
-ENTRY_POINT=0x41000000
+LOAD_ADDRESS=0x40080000
+ENTRY_POINT=0x40080000
 IMAGE_DATA=Image.gz
+COMP=gzip
+endif
+
+ifeq ($(TARGET_BOARD_PLATFORM), sitar)
+LOAD_ADDRESS=0x80008000
+ENTRY_POINT=0x80008000
 endif
 
 define mkuImage
@@ -38,7 +44,7 @@ endef
 
 define Image/BuildKernel
 	$(call mkuImage, \
-		none, $(LOAD_ADDRESS), $(ENTRY_POINT), \
+		$(COMP), $(LOAD_ADDRESS), $(ENTRY_POINT), \
 		$(KDIR)/$(IMAGE_DATA), $(TARGET_OUT_DIR)/$(IMG_PREFIX)-uImage \
 		)
 endef

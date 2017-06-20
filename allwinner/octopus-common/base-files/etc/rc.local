@@ -13,4 +13,6 @@ amixer cset iface=MIXER,name='Right Output Mixer DACR Switch' 1
 amixer cset iface=MIXER,name='SPK_L Mux' 0
 amixer cset iface=MIXER,name='SPK_R Mux' 0
 amixer cset iface=MIXER,name='External Speaker Switch' 1
+#pvr init set
+pvrsrvctl --start --no-module
 exit 0
