@@ -116,7 +116,7 @@ pll10           = 264
 [dram_para]
 ; params for double face
 dram_clk        = 672
-dram_type       = 3
+dram_type       = 7
 dram_zq         = 0x3b3bdd
 dram_odt_en     = 0x1
 dram_para1      = 0x10E410E4
