@@ -833,7 +833,7 @@ smc_sda             =
 ;--------------------------------
 [usbc0]
 usbc0_used          = 1
-usb_port_type       = 1
+usb_port_type       = 0
 usb_detect_type     = 0
 usb_id_gpio         =
 usb_det_vbus_gpio   =
