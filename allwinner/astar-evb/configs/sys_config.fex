@@ -170,7 +170,7 @@ standby_mode		= 1
 
 dram_clk        = 552
 dram_type       = 3
-dram_zq         = 0x3bbb
+dram_zq         = 0x3bfb
 dram_odt_en     = 1
 dram_para1      = 0x10F20200
 dram_para2      = 0x00
@@ -191,7 +191,7 @@ dram_tpr9       = 0x0
 dram_tpr10      = 0x0
 dram_tpr11      = 0x0
 dram_tpr12      = 168
-dram_tpr13      = 0x10900
+dram_tpr13      = 0x00800
 
 ;---------------------------------------------------------------------------------------------------------
 ; if 1 == standby_mode, then support super standby;
